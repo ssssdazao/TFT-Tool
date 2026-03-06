@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from analyzer import TFTAnalyzer
 import time
+from pathlib import Path
 
 # Set page config
 st.set_page_config(page_title="装备助手", page_icon="🛠️", layout="wide", initial_sidebar_state="expanded")
@@ -19,8 +20,9 @@ def set_bg_and_style():
     # 尝试加载本地背景 bg.jpg
     bg_style = ""
     try:
-        if os.path.exists("bg.jpg"):
-            bg_base64 = get_base64_of_bin_file("bg.jpg")
+        bg_path = Path(__file__).resolve().parent / "bg.jpg"
+        if bg_path.exists():
+            bg_base64 = get_base64_of_bin_file(str(bg_path))
             bg_style = f"""
             background-image: url("data:image/jpeg;base64,{bg_base64}");
             """
@@ -222,10 +224,35 @@ def set_bg_and_style():
 set_bg_and_style()
 st.markdown('<div class="main-glass"></div>', unsafe_allow_html=True)
 
+def _app_dir_name():
+    p = Path(__file__).resolve()
+    if p.parent.name.lower() == "pages":
+        return p.parents[1].name
+    return p.parent.name
+
+
+def _nav_link(path: str, label: str, icon: str):
+    app_dir = _app_dir_name()
+    candidates = [path, f"{app_dir}/{path}"]
+    for c in candidates:
+        try:
+            st.page_link(c, label=label, icon=icon)
+            return
+        except Exception:
+            pass
+    if st.button(f"{icon} {label}", use_container_width=True):
+        for c in candidates:
+            try:
+                st.switch_page(c)
+                return
+            except Exception:
+                pass
+
+
 with st.sidebar:
     st.markdown("### 导航")
-    st.page_link("main.py", label="装备助手", icon="🛠️")
-    st.page_link("pages/1_Battle_Simulator.py", label="战斗模拟", icon="⚔️")
+    _nav_link("main.py", label="装备助手", icon="🛠️")
+    _nav_link("pages/1_Battle_Simulator.py", label="战斗模拟", icon="⚔️")
 
 # 统一的大玻璃容器开始
 # st.markdown('<div class="glass-container" style="padding: 40px;">', unsafe_allow_html=True)

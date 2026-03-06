@@ -1,6 +1,7 @@
 import json
 import random
 import streamlit as st
+from pathlib import Path
 
 
 st.set_page_config(page_title="战斗模拟", page_icon="⚔️", layout="wide", initial_sidebar_state="expanded")
@@ -18,8 +19,9 @@ def set_bg_and_style():
 
     bg_style = ""
     try:
-        if os.path.exists("bg.jpg"):
-            bg_base64 = get_base64_of_bin_file("bg.jpg")
+        bg_path = Path(__file__).resolve().parents[1] / "bg.jpg"
+        if bg_path.exists():
+            bg_base64 = get_base64_of_bin_file(str(bg_path))
             bg_style = f"""
             background-image: url("data:image/jpeg;base64,{bg_base64}");
             """
@@ -175,11 +177,35 @@ def role_block(prefix: str, label: str, defaults: dict):
         "burst_dmg": float(burst_dmg),
     }
 
+def _app_dir_name():
+    p = Path(__file__).resolve()
+    if p.parent.name.lower() == "pages":
+        return p.parents[1].name
+    return p.parent.name
+
+
+def _nav_link(path: str, label: str, icon: str):
+    app_dir = _app_dir_name()
+    candidates = [path, f"{app_dir}/{path}"]
+    for c in candidates:
+        try:
+            st.page_link(c, label=label, icon=icon)
+            return
+        except Exception:
+            pass
+    if st.button(f"{icon} {label}", use_container_width=True):
+        for c in candidates:
+            try:
+                st.switch_page(c)
+                return
+            except Exception:
+                pass
+
 
 with st.sidebar:
     st.markdown("### 导航")
-    st.page_link("main.py", label="装备助手", icon="🛠️")
-    st.page_link("pages/1_Battle_Simulator.py", label="战斗模拟", icon="⚔️")
+    _nav_link("main.py", label="装备助手", icon="🛠️")
+    _nav_link("pages/1_Battle_Simulator.py", label="战斗模拟", icon="⚔️")
 
 st.sidebar.markdown("### 参数面板")
 seed = st.sidebar.number_input("随机种子", min_value=0, max_value=2_147_483_647, value=12345, step=1)
