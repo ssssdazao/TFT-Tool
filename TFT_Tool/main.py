@@ -4,7 +4,7 @@ from analyzer import TFTAnalyzer
 import time
 
 # Set page config
-st.set_page_config(page_title="云顶之弈英雄装备助手", page_icon="⚔️", layout="wide")
+st.set_page_config(page_title="装备助手", page_icon="🛠️", layout="wide", initial_sidebar_state="expanded")
 
 # --- 全局样式与背景设置 ---
 def get_base64_of_bin_file(bin_file):
@@ -53,9 +53,33 @@ def set_bg_and_style():
         /* 2. 隐藏 Streamlit 默认元素 */
         #MainMenu {{visibility: hidden;}}
         footer {{visibility: hidden;}}
-        header {{visibility: hidden;}}
+
+        /* 3. 侧边栏与导航 */
+        section[data-testid="stSidebar"] {{
+            visibility: visible !important;
+            display: block !important;
+            background: rgba(18, 18, 30, 0.52) !important;
+            backdrop-filter: blur(14px) !important;
+            -webkit-backdrop-filter: blur(14px) !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.10) !important;
+        }}
+        section[data-testid="stSidebar"] > div {{
+            background: transparent !important;
+        }}
+        div[data-testid="stSidebarNav"] {{
+            display: none !important;
+        }}
+        div[data-testid="stSidebarNav"] a {{
+            border-radius: 12px !important;
+        }}
+        div[data-testid="stSidebarNav"] a:hover {{
+            background: rgba(255, 255, 255, 0.08) !important;
+        }}
+        div[data-testid="stSidebarNav"] span {{
+            font-weight: 700 !important;
+        }}
         
-        /* 3. 全局玻璃背景板 (Fixed Glass Overlay) */
+        /* 4. 全局玻璃背景板 (Fixed Glass Overlay) */
         .main-glass {{
             position: fixed;
             top: 10vh;
@@ -86,7 +110,7 @@ def set_bg_and_style():
             to {{ opacity: 1; transform: translateY(0); }}
         }}
 
-        /* 4. 标题样式 - 强烈的个人风格 */
+        /* 5. 标题样式 - 强烈的个人风格 */
         .main-title {{
             font-family: 'Zcool KuaiLe', sans-serif; /* 快乐体，更有动漫感 */
             font-size: 3.5rem;
@@ -197,6 +221,11 @@ def set_bg_and_style():
 
 set_bg_and_style()
 st.markdown('<div class="main-glass"></div>', unsafe_allow_html=True)
+
+with st.sidebar:
+    st.markdown("### 导航")
+    st.page_link("main.py", label="装备助手", icon="🛠️")
+    st.page_link("pages/1_Battle_Simulator.py", label="战斗模拟", icon="⚔️")
 
 # 统一的大玻璃容器开始
 # st.markdown('<div class="glass-container" style="padding: 40px;">', unsafe_allow_html=True)
